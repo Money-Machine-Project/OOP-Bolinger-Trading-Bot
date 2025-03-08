@@ -2,6 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import hpp from "hpp";
 import dotenv from "dotenv";
+import main from "./main.js";
 import authLimiter from "./util/rateLimiter.js";
 dotenv.config();
 const app = express();
@@ -19,4 +20,5 @@ app.use((req, res, next) => {
 });
 app.listen(process.env.DEV_PORT, async () => {
     console.log("🚩 Server Start 🚩", process.env.DEV_PORT);
+    main();
 });
