@@ -2,6 +2,7 @@ import express from "express";
 import helmet from "helmet";
 import hpp from "hpp";
 import dotenv from "dotenv";
+import authLimiter from "./util/rateLimiter.js";
 dotenv.config();
 
 const app = express();
@@ -11,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(hpp());
 
-//app.use("/", authLimiter);
+app.use("/", authLimiter);
 
 app.use(
   (req: express.Request, res: express.Response, next: express.NextFunction) => {
