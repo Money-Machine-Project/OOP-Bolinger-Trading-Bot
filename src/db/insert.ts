@@ -13,7 +13,7 @@ const logInsert = async (
 
 const resultInsert = async (
   date: string,
-  money: string,
+  money: number,
   profitRate: number
 ) => {
   await pool.query(
