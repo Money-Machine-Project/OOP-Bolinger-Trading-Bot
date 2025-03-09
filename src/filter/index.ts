@@ -17,7 +17,6 @@ export class DefaultFilter extends Filter {
 
 export class NoTradeFilter extends Filter {
   override async handle(): Promise<void> {
-    console.log(1);
     if (this.next) {
       await this.next.handle();
     }
@@ -26,7 +25,6 @@ export class NoTradeFilter extends Filter {
 
 export class CutFilter extends Filter {
   override async handle(): Promise<void> {
-    console.log(2);
     if (this.next) {
       await this.next.handle();
     }
@@ -35,7 +33,6 @@ export class CutFilter extends Filter {
 
 export class TradingFilter extends Filter {
   override async handle(): Promise<void> {
-    console.log(3);
     if (this.next) {
       await this.next.handle();
     }
