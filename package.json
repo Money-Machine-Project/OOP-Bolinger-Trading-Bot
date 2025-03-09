@@ -32,6 +32,7 @@
   "devDependencies": {
     "@types/express": "^5.0.0",
     "@types/helmet": "^4.0.0",
-    "@types/hpp": "^0.2.6"
+    "@types/hpp": "^0.2.6",
+    "@types/nodemailer": "^6.4.17"
   }
 }
