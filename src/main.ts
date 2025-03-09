@@ -3,7 +3,7 @@ import {
   UpDownStrategyFactory,
 } from "./StrategyFactory.js";
 
-async function main() {
+async function main(price: string, accessToken: string) {
   const strategy = NPusStrategyFactory.createStrategy();
   const nplus = await strategy.exe();
 }
