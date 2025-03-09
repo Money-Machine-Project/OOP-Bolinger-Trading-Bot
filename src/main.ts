@@ -3,9 +3,9 @@ import {
   UpDownStrategyFactory,
 } from "./StrategyFactory.js";
 
-function main() {
+async function main() {
   const strategy = NPusStrategyFactory.createStrategy();
-  const nplus = strategy.exe();
+  const nplus = await strategy.exe();
 }
 
 export default main;
