@@ -19,7 +19,7 @@ class AccessToken extends OpenApi {
 
   static Builder = class AccessTokenBuilder extends OpenApiBuilder {
     override openApi: AccessToken;
-    constructor(accessToken: string) {
+    constructor() {
       super();
       this.openApi = new AccessToken();
     }

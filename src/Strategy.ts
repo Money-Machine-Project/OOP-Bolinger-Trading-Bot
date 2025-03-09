@@ -21,6 +21,8 @@ export class NPusStrategy extends Strategy {
   private static instance: NPusStrategy;
   override async exe() {
     console.log("NPlus 전략 시작");
+    const aa = new AccessToken.Builder().build();
+    console.log(await aa.handle());
     const df = new DefaultFilter();
     let filter = df;
     if (false) {
