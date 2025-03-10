@@ -15,19 +15,21 @@ export class NPusStrategy extends Strategy {
   private static instance: NPusStrategy;
   override async exe(price: string, accessToken: string) {
     console.log("NPlus 전략 시작");
-    const aa = new AccessToken.Builder().build();
-    console.log(await aa.handle());
     const df = new DefaultFilter();
     let filter = df;
-    if (false) {
+    if (true) {
       const ntf = new NoTradeFilter();
       filter = filter.setNext(ntf);
     }
-    if (false) {
+    if (false && !(filter instanceof NoTradeFilter)) {
       const cf = new CutFilter();
       filter = filter.setNext(cf);
     }
-    if (true) {
+    if (
+      true &&
+      !(filter instanceof NoTradeFilter) &&
+      !(filter instanceof CutFilter)
+    ) {
       const tf = new TradingFilter();
       filter = filter.setNext(tf);
     }
