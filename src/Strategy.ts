@@ -4,22 +4,16 @@ import {
   NoTradeFilter,
   TradingFilter,
 } from "./filter/index.js";
-import CanBuy from "./api/core/CanBuy.js";
-import StockBalance from "./api/core/StockBalance.js";
-import AccessToken from "./api/core/AccessToken.js";
-import RetradingOrder from "./api/core/RetradingOrder.js";
-import TradingOrder from "./api/core/TradingOrder.js";
-import TradingSettlementDetail from "./api/core/TradingSettlementDetail.js";
-import StockTimeSeriesPrice from "./api/core/StockTimeSeriesPrice.js";
+import AccessToken from "./api/token/AccessToken.js";
 
 abstract class Strategy {
-  abstract exe(): void;
+  abstract exe(price: string, accessToken: string): void;
   static getInstance() {}
 }
 
 export class NPusStrategy extends Strategy {
   private static instance: NPusStrategy;
-  override async exe() {
+  override async exe(price: string, accessToken: string) {
     console.log("NPlus 전략 시작");
     const aa = new AccessToken.Builder().build();
     console.log(await aa.handle());
