@@ -8,11 +8,6 @@ import TradingOrder from "./api/core/TradingOrder.js";
 import getTradingTime from "./util/getTradingTime.js";
 import CanBuy from "./api/core/CanBuy.js";
 
-interface StrategyElement {
-  bPercent: number;
-  rsi: number;
-}
-
 abstract class TradeBuilder {
   element!: TradeElement;
   constructor() {}
@@ -25,33 +20,25 @@ abstract class TradeElement {
   protected accessToken: string;
   protected symbol: string;
   protected realTimeData: number;
-  protected strategyElement: StrategyElement;
 
-  constructor(
-    accessToken: string,
-    symbol: string,
-    realTimeData: number,
-    strategyElement: StrategyElement
-  ) {
+  constructor(accessToken: string, symbol: string, realTimeData: number) {
     this.accessToken = accessToken;
     this.symbol = symbol;
     this.realTimeData = realTimeData;
-    this.strategyElement = strategyElement;
   }
 
   abstract handle(): Promise<void>;
 }
 
-class Sell extends TradeElement {
+export class Sell extends TradeElement {
   private qty: number;
   constructor(
     qty: number,
     accessToken: string,
     symbol: string,
-    realTimeData: number,
-    strategyElement: StrategyElement
+    realTimeData: number
   ) {
-    super(accessToken, symbol, realTimeData, strategyElement);
+    super(accessToken, symbol, realTimeData);
     this.qty = qty;
   }
 
@@ -67,20 +54,22 @@ class Sell extends TradeElement {
     )
       .build()
       .handle();
-    await setValue(
-      "tradingTime",
-      `${String(getTimeInterval(getTradingTime(), 5).index)}+sell`
-    ),
-      await logInsert("매도", this.symbol, this.qty);
-    await sendMail("TRADING_TRY", {
-      symbolName: this.symbol,
-      tradingCount: this.qty,
-      type: "매도",
-      date: getNowDate(),
-      bPercent: this.strategyElement.bPercent,
-      money: this.realTimeData,
-      rsi: this.strategyElement.rsi,
-    });
+
+    // 어떤 전략인지에 따라 StrategyElement 요소가 달라진다. 위 플래그 설정을 전략 exe()에서 pub/sub패턴을 이용하여 세팅
+    // await setValue(
+    //   "tradingTime",
+    //   `${String(getTimeInterval(getTradingTime(), 5).index)}+sell`
+    // ),
+    // await logInsert("매도", this.symbol, this.qty);
+    // await sendMail("TRADING_TRY", {
+    //   symbolName: this.symbol,
+    //   tradingCount: this.qty,
+    //   type: "매도",
+    //   date: getNowDate(),
+    //   bPercent: this.strategyElement.bPercent,
+    //   money: this.realTimeData,
+    //   rsi: this.strategyElement.rsi,
+    // });
   }
 
   static Builder = class SellBuilder extends TradeBuilder {
@@ -89,29 +78,17 @@ class Sell extends TradeElement {
       qty: number,
       accessToken: string,
       symbol: string,
-      realTimeData: number,
-      strategyElement: StrategyElement
+      realTimeData: number
     ) {
       super();
-      this.element = new Sell(
-        qty,
-        accessToken,
-        symbol,
-        realTimeData,
-        strategyElement
-      );
+      this.element = new Sell(qty, accessToken, symbol, realTimeData);
     }
   };
 }
 
-class Buy extends TradeElement {
-  constructor(
-    accessToken: string,
-    symbol: string,
-    realTimeData: number,
-    strategyElement: StrategyElement
-  ) {
-    super(accessToken, symbol, realTimeData, strategyElement);
+export class Buy extends TradeElement {
+  constructor(accessToken: string, symbol: string, realTimeData: number) {
+    super(accessToken, symbol, realTimeData);
   }
 
   override async handle(): Promise<void> {
@@ -140,43 +117,33 @@ class Buy extends TradeElement {
       )
         .build()
         .handle();
-      await Promise.all([
-        setValue("buyPrice", String(this.realTimeData)),
-        setValue("buyCount", String(buyCount)),
-        setValue("sellPrice", String(Number(this.realTimeData) - 10)),
-        setValue(
-          "tradingTime",
-          `${String(getTimeInterval(getTradingTime(), 5).index)}+buy`
-        ),
-      ]);
-      await logInsert("매수", this.symbol, buyCount);
-      await sendMail("TRADING_TRY", {
-        symbolName: this.symbol,
-        tradingCount: buyCount,
-        type: "매수",
-        date: getNowDate(),
-        bPercent: this.strategyElement.bPercent,
-        money: this.realTimeData,
-        rsi: this.strategyElement.rsi,
-      });
+      //   await Promise.all([
+      //     setValue("buyPrice", String(this.realTimeData)),
+      //     setValue("buyCount", String(buyCount)),
+      //     setValue("sellPrice", String(Number(this.realTimeData) - 10)),
+      //     setValue(
+      //       "tradingTime",
+      //       `${String(getTimeInterval(getTradingTime(), 5).index)}+buy`
+      //     ),
+      //   ]);
+      //   await logInsert("매수", this.symbol, buyCount);
+      //   await sendMail("TRADING_TRY", {
+      //     symbolName: this.symbol,
+      //     tradingCount: buyCount,
+      //     type: "매수",
+      //     date: getNowDate(),
+      //     bPercent: this.strategyElement.bPercent,
+      //     money: this.realTimeData,
+      //     rsi: this.strategyElement.rsi,
+      //   });
     }
   }
 
   static Builder = class BuyBuilder extends TradeBuilder {
     override element: Buy;
-    constructor(
-      accessToken: string,
-      symbol: string,
-      realTimeData: number,
-      strategyElement: StrategyElement
-    ) {
+    constructor(accessToken: string, symbol: string, realTimeData: number) {
       super();
-      this.element = new Buy(
-        accessToken,
-        symbol,
-        realTimeData,
-        strategyElement
-      );
+      this.element = new Buy(accessToken, symbol, realTimeData);
     }
   };
 }
