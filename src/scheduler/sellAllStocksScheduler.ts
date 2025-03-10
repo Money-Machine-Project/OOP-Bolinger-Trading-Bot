@@ -55,7 +55,7 @@ const sellAllStocksScheduler = async () => {
           }
 
           for (const element of data.output1) {
-            new TradingOrder.Builder(
+            await new TradingOrder.Builder(
               accessToken,
               "VTTC0801U",
               element.pdno,
@@ -68,7 +68,6 @@ const sellAllStocksScheduler = async () => {
             await logInsert("매도", element.prdt_name, element.hldg_qty);
             await sleep(1000);
           }
-
           console.log("전량 매도 완료");
           await Promise.all([
             deleteValue("cutOff"),
