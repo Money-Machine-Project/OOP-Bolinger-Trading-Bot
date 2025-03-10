@@ -1,5 +1,5 @@
 import schedule from "node-schedule";
-import AccessToken from "../api/core/AccessToken.js";
+import AccessToken from "../api/token/AccessToken.js";
 import { setValue } from "../db/redisManager.js";
 import { redisStatusCheck } from "../util/serverStatusCheck.js";
 
