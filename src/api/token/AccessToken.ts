@@ -1,10 +1,9 @@
-import OpenApi from "../OpenApi.js";
 import OpenApiBuilder from "../OpenApiBuilder.js";
 import axios from "axios";
 import config from "../../config/config.js";
 
-class AccessToken extends OpenApi {
-  override async handle() {
+class AccessToken {
+  async handle() {
     console.log("AccessToken Start");
     const path = "/oauth2/tokenP";
     const fullUrl = `${config.baseUrl}${path}`;
