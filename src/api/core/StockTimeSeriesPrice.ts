@@ -4,10 +4,9 @@ import axios from "axios";
 import config from "../../config/config.js";
 
 class StockTimeSeriesPrice extends OpenApi {
-  private accessToken: string;
   private symbol: string;
   constructor(accessToken: string, symbol: string) {
-    super();
+    super(accessToken);
     this.accessToken = accessToken;
     this.symbol = symbol;
   }

@@ -4,9 +4,8 @@ import axios from "axios";
 import config from "../../config/config.js";
 
 class StockBalance extends OpenApi {
-  private accessToken: string;
   constructor(accessToken: string) {
-    super();
+    super(accessToken);
     this.accessToken = accessToken;
   }
   override async handle() {

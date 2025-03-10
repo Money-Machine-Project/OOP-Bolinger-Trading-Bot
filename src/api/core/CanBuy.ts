@@ -4,7 +4,6 @@ import axios from "axios";
 import config from "../../config/config.js";
 
 class CanBuy extends OpenApi {
-  private accessToken: string;
   private symbol: string;
   private unpr: string;
   private dvsn: string;
@@ -19,7 +18,7 @@ class CanBuy extends OpenApi {
     evluAmtIcld: string,
     icld: string
   ) {
-    super();
+    super(accessToken);
     this.accessToken = accessToken;
     this.symbol = symbol;
     this.unpr = unpr;

@@ -4,7 +4,6 @@ import axios from "axios";
 import config from "../../config/config.js";
 
 class TradingOrder extends OpenApi {
-  private accessToken: string;
   private trId: string;
   private symbol: string;
   private orderType: string;
@@ -18,7 +17,7 @@ class TradingOrder extends OpenApi {
     orderQuantitiy: string,
     orderPrice: string
   ) {
-    super();
+    super(accessToken);
     this.accessToken = accessToken;
     this.trId = trId;
     this.symbol = symbol;

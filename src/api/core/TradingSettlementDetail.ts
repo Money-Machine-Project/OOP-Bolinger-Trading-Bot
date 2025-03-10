@@ -5,7 +5,6 @@ import config from "../../config/config.js";
 
 class TradingSettlementDetail extends OpenApi {
   private today: string;
-  private accessToken: string;
   private symbol: string;
   private type: string;
   private tradeComplete: string;
@@ -23,7 +22,7 @@ class TradingSettlementDetail extends OpenApi {
     ctxAreaFK100?: string,
     ctxAreaNk100?: string
   ) {
-    super();
+    super(accessToken);
     this.today = today;
     this.accessToken = accessToken;
     this.symbol = symbol;
