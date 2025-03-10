@@ -1,8 +1,9 @@
 import OpenApiBuilder from "../OpenApiBuilder.js";
 import axios from "axios";
 import config from "../../config/config.js";
+import OpenApi from "../OpenApi.js";
 
-class AccessToken {
+class AccessToken extends OpenApi {
   async handle() {
     console.log("AccessToken Start");
     const path = "/oauth2/tokenP";
