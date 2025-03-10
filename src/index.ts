@@ -30,5 +30,4 @@ app.use(
 
 app.listen(process.env.DEV_PORT, async () => {
   console.log("🚩 Server Start 🚩", process.env.DEV_PORT);
-  main();
 });

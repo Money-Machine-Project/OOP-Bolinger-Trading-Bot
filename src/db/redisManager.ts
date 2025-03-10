@@ -8,9 +8,9 @@ const getValue = async (key: string) => {
   return redisClient.v4.get(key);
 };
 
-const setArray = async (key: string, array: string[], ttl: string) => {
+const setArray = async (key: string, array: string[]) => {
   const arrayString = JSON.stringify(array);
-  await redisClient.v4.set(key, arrayString, "EX", ttl);
+  await redisClient.v4.set(key, arrayString, "EX");
 };
 
 const getArray = async (key: string) => {
