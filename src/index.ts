@@ -4,6 +4,16 @@ import hpp from "hpp";
 import dotenv from "dotenv";
 import main from "./main.js";
 import authLimiter from "./util/rateLimiter.js";
+import { connectToRedis } from "./config/redis.js";
+import pool from "./config/db.js";
+import accessTokenScheduler from "./scheduler/accessTokenScheduler.js";
+import { getValue } from "./db/redisManager.js";
+import sellAllStocksScheduler from "./scheduler/sellAllStocksScheduler.js";
+import dayResultScheduler from "./scheduler/dayResultScheduler.js";
+import minuteCandleResetScheduler from "./scheduler/minuteCandleResetScheduler.js";
+import getSecondStockScheduler from "./scheduler/getSecondStockScheduler.js";
+import accessTokenManager from "./api/token/accessTokenManager.js";
+
 dotenv.config();
 
 const app = express();
@@ -28,6 +38,23 @@ app.use(
   }
 );
 
+connectToRedis();
 app.listen(process.env.DEV_PORT, async () => {
   console.log("🚩 Server Start 🚩", process.env.DEV_PORT);
+  const connection = await pool.getConnection();
+  console.log("MySQL Database connected successfully");
+  connection.release();
+
+  await accessTokenManager();
+
+  accessTokenScheduler();
+  //await webSocketKeyManage();
+  const accessToken = await getValue("accessToken");
+  sellAllStocksScheduler();
+  dayResultScheduler(
+    String(process.env.SYMBOL),
+    String(process.env.SYMBOL_INVERSE)
+  );
+  minuteCandleResetScheduler();
+  getSecondStockScheduler();
 });
