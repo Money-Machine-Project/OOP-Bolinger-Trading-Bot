@@ -1,11 +1,19 @@
+import { promises } from "nodemailer/lib/xoauth2/index.js";
 import {
   NPusStrategyFactory,
   UpDownStrategyFactory,
 } from "./StrategyFactory.js";
+import { SubscriptionManager } from "./SubscriptionManager.js";
 
-async function main(price: string, accessToken: string) {
+async function main(
+  scheduler: (
+    strategy: (price: string, accessToken: string) => Promise<void>
+  ) => void
+) {
   const strategy = NPusStrategyFactory.createStrategy();
-  const nplus = await strategy.exe(price, accessToken);
+  await SubscriptionManager.getInstance().addEvent("redis-flag");
+  await SubscriptionManager.getInstance().addEvent("db-log");
+  scheduler(strategy.exe);
 }
 
 export default main;

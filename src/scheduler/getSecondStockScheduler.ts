@@ -5,7 +5,9 @@ import main from "../main.js";
 import config from "../config/config.js";
 import StockTimeSeriesPrice from "../api/core/StockTimeSeriesPrice.js";
 
-const getSecondStockScheduler = async () => {
+const getSecondStockScheduler = async (
+  strategy: (price: string, accessToken: string) => Promise<void>
+) => {
   cron.schedule("*/2 * * * * 1-5", async function () {
     try {
       const accessToken = await getValue("accessToken");
@@ -23,8 +25,7 @@ const getSecondStockScheduler = async () => {
         config.symbolInverse as string
       ).build();
       const inverseStockData = await object.handle();
-      await main(inverseStockData.stck_prpr, accessToken);
-      //  }
+      await strategy(inverseStockData.stck_prpr, accessToken);
     } catch (error) {
       console.error("스케줄러 실행 중 오류 발생:", error);
     }

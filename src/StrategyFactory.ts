@@ -1,4 +1,5 @@
 import { NPusStrategy, UpDownStrategy } from "./Strategy.js";
+import { SubscriptionManager } from "./SubscriptionManager.js";
 
 abstract class StrategyFactory {
   static createStrategy() {

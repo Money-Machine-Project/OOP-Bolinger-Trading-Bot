@@ -13,6 +13,7 @@ import dayResultScheduler from "./scheduler/dayResultScheduler.js";
 import minuteCandleResetScheduler from "./scheduler/minuteCandleResetScheduler.js";
 import getSecondStockScheduler from "./scheduler/getSecondStockScheduler.js";
 import accessTokenManager from "./api/token/accessTokenManager.js";
+import { SubscriptionManager } from "./SubscriptionManager.js";
 
 dotenv.config();
 
@@ -44,11 +45,9 @@ app.listen(process.env.DEV_PORT, async () => {
   const connection = await pool.getConnection();
   console.log("MySQL Database connected successfully");
   connection.release();
-
+  main((strategy) => getSecondStockScheduler(strategy));
   await accessTokenManager();
-
   accessTokenScheduler();
-  //await webSocketKeyManage();
   const accessToken = await getValue("accessToken");
   sellAllStocksScheduler();
   dayResultScheduler(
@@ -56,5 +55,4 @@ app.listen(process.env.DEV_PORT, async () => {
     String(process.env.SYMBOL_INVERSE)
   );
   minuteCandleResetScheduler();
-  getSecondStockScheduler();
 });
