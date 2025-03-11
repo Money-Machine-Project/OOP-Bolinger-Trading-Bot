@@ -10,6 +10,7 @@ abstract class StrategyFactory {
 export class NPusStrategyFactory extends StrategyFactory {
   static override createStrategy() {
     return NPusStrategy.getInstance();
+    //   SubscriptionManager.getInstance().subscribe()
   }
 }
 

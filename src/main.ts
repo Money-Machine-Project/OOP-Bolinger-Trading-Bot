@@ -7,7 +7,7 @@ import { SubscriptionManager } from "./SubscriptionManager.js";
 
 async function main(
   scheduler: (
-    strategy: (price: string, accessToken: string) => Promise<void>
+    strategy: (price: number, accessToken: string) => Promise<void>
   ) => void
 ) {
   const strategy = NPusStrategyFactory.createStrategy();
