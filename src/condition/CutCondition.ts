@@ -1,6 +1,5 @@
-import { Service } from "typedi";
-import { getValue } from "./db/redisManager.js";
-import isTradingAllowed from "./util/isTradeAllowed.js";
+import isTradingAllowed from "../util/isTradeAllowed.js";
+import { getValue } from "../db/redisManager.js";
 
 export interface CutCondition {
   evaluate(): Promise<boolean>;

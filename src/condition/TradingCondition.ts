@@ -1,5 +1,5 @@
 import { Service } from "typedi";
-import isTradingAllowed from "./util/isTradeAllowed.js";
+import isTradingAllowed from "../util/isTradeAllowed.js";
 
 export interface TradingCondition {
   evaluate(): Promise<boolean>;
