@@ -1,16 +1,30 @@
-import {
-  CutFilter,
-  DefaultFilter,
-  NoTradeFilter,
-  TradingFilter,
-} from "./filter/index.js";
-import AccessToken from "./api/token/AccessToken.js";
-import { Service, Container } from "typedi";
 import { SubscriptionManager } from "./SubscriptionManager.js";
-import { getArray } from "./db/redisManager.js";
+import { getValue } from "./db/redisManager.js";
+import StockBalance from "./api/core/StockBalance.js";
+import { CutAction, NPlusCutAction } from "./CutAction.js";
+import { CutCondition, NPlusCutCondition } from "./CutCondition.js";
+import {
+  NoTradingCondition,
+  NPlusNoTradingCondition,
+} from "./NoTradingCondition.js";
+import { NPlusTradingAction, TradingAction } from "./TradingAction.js";
+import { NPlusTradingCondition, TradingCondition } from "./TradingCondition.js";
+import { NoTradingAction, NPlusNoTradingAction } from "./NoTradeAction.js";
+import { Inject, Service } from "typedi";
+
+interface Condition {
+  noTradingCondition: NoTradingCondition;
+  cutCondition: CutCondition;
+  tradingCondition: TradingCondition;
+}
+
+interface Pair {
+  condition: NoTradingCondition | CutCondition | TradingCondition;
+  action: NoTradingAction | CutAction | TradingAction;
+}
 
 abstract class Strategy {
-  abstract exe(price: string, accessToken: string): void;
+  abstract exe(price: number, accessToken: string): void;
   constructor() {}
   static getInstance() {}
 }
@@ -18,28 +32,35 @@ abstract class Strategy {
 export class NPusStrategy extends Strategy {
   private static instance: NPusStrategy;
 
-  override async exe(price: string, accessToken: string) {
+  override async exe(price: number, accessToken: string) {
     console.log("NPlus 전략 시작");
-    const df = new DefaultFilter();
-    let filter = df;
-    if (true) {
-      const ntf = new NoTradeFilter();
-      filter = filter.setNext(ntf);
+    const [sellPrice, data, tradingTime] = await Promise.all([
+      getValue("sellPrice"),
+      new StockBalance.Builder(accessToken).build().handle(),
+      getValue("tradingTime"),
+    ]);
+    const nPlusPair: Pair[] = [
+      {
+        condition: NPlusNoTradingCondition.getInstance(tradingTime),
+        action: NPlusNoTradingAction.getInstance(),
+      },
+      {
+        condition: NPlusCutCondition.getInstance(sellPrice, price, data),
+        action: NPlusCutAction.getInstance(accessToken, data, price, sellPrice),
+      },
+      {
+        condition: NPlusTradingCondition.getInstance(),
+        action: NPlusTradingAction.getInstance(),
+      },
+    ];
+    for (const pair of nPlusPair) {
+      if (await pair.condition.evaluate()) {
+        await pair.action.action();
+        break;
+      }
     }
-    if (false && !(filter instanceof NoTradeFilter)) {
-      const cf = new CutFilter();
-      filter = filter.setNext(cf);
-    }
-    if (
-      true &&
-      !(filter instanceof NoTradeFilter) &&
-      !(filter instanceof CutFilter)
-    ) {
-      const tf = new TradingFilter();
-      filter = filter.setNext(tf);
-    }
-    await df.handle();
   }
+
   static override getInstance() {
     if (!this.instance) {
       return new NPusStrategy();
