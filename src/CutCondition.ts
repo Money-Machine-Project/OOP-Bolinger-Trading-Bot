@@ -1,11 +1,13 @@
+import { Service } from "typedi";
 import { getValue } from "./db/redisManager.js";
 import isTradingAllowed from "./util/isTradeAllowed.js";
 
-interface CutCondition {
-  evaluate(): boolean | Promise<boolean>;
+export interface CutCondition {
+  evaluate(): Promise<boolean>;
 }
 
-class NPlusCutCondition implements CutCondition {
+export class NPlusCutCondition implements CutCondition {
+  static instance: NPlusCutCondition;
   constructor(
     private sellPrice: number,
     private price: number,
@@ -24,10 +26,24 @@ class NPlusCutCondition implements CutCondition {
     }
     return false;
   }
+
+  static getInstance(sellPrice: number, price: number, data: any) {
+    if (!this.instance) {
+      return new NPlusCutCondition(sellPrice, price, data);
+    }
+    return this.instance;
+  }
 }
 
 class UpDownCutCondition implements CutCondition {
-  evaluate(): boolean | Promise<boolean> {
+  static instance: UpDownCutCondition;
+  async evaluate(): Promise<boolean> {
     return false;
+  }
+  static getInstance() {
+    if (!this.instance) {
+      return new UpDownCutCondition();
+    }
+    return this.instance;
   }
 }

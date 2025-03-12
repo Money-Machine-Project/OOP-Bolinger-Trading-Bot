@@ -1,12 +1,14 @@
+import { Service } from "typedi";
 import checkTradingTimeExceed from "./util/checkTradingTimeExceed.js";
 
-interface NoTradingCondition {
-  evaluate(): boolean | Promise<boolean>;
+export interface NoTradingCondition {
+  evaluate(): Promise<boolean>;
 }
 
-class NPlusNoTradingCondition implements NoTradingCondition {
+export class NPlusNoTradingCondition implements NoTradingCondition {
+  static instance: NPlusNoTradingCondition;
   constructor(private tradingTime: string) {}
-  evaluate(): boolean | Promise<boolean> {
+  async evaluate(): Promise<boolean> {
     if (
       this.tradingTime !== null &&
       (this.tradingTime.split("+")[1] === "sell" ||
@@ -17,10 +19,23 @@ class NPlusNoTradingCondition implements NoTradingCondition {
     }
     return false;
   }
+  static getInstance(tradingTime: string) {
+    if (!this.instance) {
+      return new NPlusNoTradingCondition(tradingTime);
+    }
+    return this.instance;
+  }
 }
 
 class UpDownNoTradingCondition implements NoTradingCondition {
-  evaluate(): boolean | Promise<boolean> {
+  static instance: NPlusNoTradingCondition;
+  async evaluate(): Promise<boolean> {
     return false;
+  }
+  static getInstance() {
+    if (!this.instance) {
+      return new UpDownNoTradingCondition();
+    }
+    return this.instance;
   }
 }

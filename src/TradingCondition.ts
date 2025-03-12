@@ -1,10 +1,12 @@
+import { Service } from "typedi";
 import isTradingAllowed from "./util/isTradeAllowed.js";
 
-interface TradingCondition {
-  evaluate(): boolean | Promise<boolean>;
+export interface TradingCondition {
+  evaluate(): Promise<boolean>;
 }
 
-class NPlusTradingCondition implements TradingCondition {
+export class NPlusTradingCondition implements TradingCondition {
+  static instance: NPlusTradingCondition;
   async evaluate(): Promise<boolean> {
     const [canSell, canBuy] = await Promise.all([
       isTradingAllowed("sell"),
@@ -12,10 +14,23 @@ class NPlusTradingCondition implements TradingCondition {
     ]);
     return canSell || canBuy;
   }
+  static getInstance() {
+    if (!this.instance) {
+      return new NPlusTradingCondition();
+    }
+    return this.instance;
+  }
 }
 
 class UpDownTradingCondition implements TradingCondition {
-  evaluate(): boolean | Promise<boolean> {
+  static instance: UpDownTradingCondition;
+  async evaluate(): Promise<boolean> {
     return false;
+  }
+  static getInstance() {
+    if (!this.instance) {
+      return new UpDownTradingCondition();
+    }
+    return this.instance;
   }
 }
