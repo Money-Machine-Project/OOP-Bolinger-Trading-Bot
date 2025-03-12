@@ -1,26 +1,36 @@
 import { SubscriptionManager } from "./SubscriptionManager.js";
-import { getValue } from "./db/redisManager.js";
+import { getArray, getValue } from "./db/redisManager.js";
 import StockBalance from "./api/core/StockBalance.js";
 import { CutAction, NPlusCutAction } from "./CutAction.js";
-import { CutCondition, NPlusCutCondition } from "./CutCondition.js";
+
+import { NoTradingAction, NPlusNoTradingAction } from "./NoTradeAction.js";
+
 import {
   NoTradingCondition,
   NPlusNoTradingCondition,
-} from "./NoTradingCondition.js";
-import { NPlusTradingAction, TradingAction } from "./TradingAction.js";
-import { NPlusTradingCondition, TradingCondition } from "./TradingCondition.js";
-import { NoTradingAction, NPlusNoTradingAction } from "./NoTradeAction.js";
-import { Inject, Service } from "typedi";
+} from "./condition/noTradingCondition.js";
+
+import { CutCondition, NPlusCutCondition } from "./condition/CutCondition.js";
+import { BuyCondition, NPlusBuyCondition } from "./condition/buyCondition.js";
+import {
+  NPlusSellCondition,
+  SellCondition,
+} from "./condition/sellCondition.js";
+import { BuyAction, NPlusBuyAction } from "./BuyAction.js";
+import { NPlusSellAction, SellAction } from "./SellAction.js";
+import getBollingerBands from "./util/getBollingerBands.js";
+import makeRsi from "./util/makeRsi.js";
 
 interface Condition {
   noTradingCondition: NoTradingCondition;
   cutCondition: CutCondition;
-  tradingCondition: TradingCondition;
+  sellCondition: SellCondition;
+  buyCondition: BuyCondition;
 }
 
 interface Pair {
-  condition: NoTradingCondition | CutCondition | TradingCondition;
-  action: NoTradingAction | CutAction | TradingAction;
+  condition: NoTradingCondition | CutCondition | SellCondition | BuyCondition;
+  action: NoTradingAction | CutAction | SellAction | BuyAction;
 }
 
 abstract class Strategy {
@@ -39,6 +49,11 @@ export class NPusStrategy extends Strategy {
       new StockBalance.Builder(accessToken).build().handle(),
       getValue("tradingTime"),
     ]);
+    const currentHoldings = data[0] ? data[0].hldg_qty : 0;
+    const buyPrice = await getValue("buyPrice");
+    const historicalData = await getArray("inverseStockPrice");
+    const bollingerX2 = getBollingerBands(historicalData, price, 2);
+    const rsi = makeRsi(historicalData, price, 5);
     const nPlusPair: Pair[] = [
       {
         condition: NPlusNoTradingCondition.getInstance(tradingTime),
@@ -49,8 +64,21 @@ export class NPusStrategy extends Strategy {
         action: NPlusCutAction.getInstance(accessToken, data, price, sellPrice),
       },
       {
-        condition: NPlusTradingCondition.getInstance(),
-        action: NPlusTradingAction.getInstance(),
+        condition: NPlusSellCondition.getInstance(
+          currentHoldings,
+          price,
+          buyPrice
+        ),
+        action: NPlusSellAction.getInstance(),
+      },
+      {
+        condition: NPlusBuyCondition.getInstance(
+          bollingerX2.bPercent,
+          currentHoldings,
+          rsi,
+          price
+        ),
+        action: NPlusBuyAction.getInstance(),
       },
     ];
     for (const pair of nPlusPair) {
