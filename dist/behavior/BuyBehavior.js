@@ -28,6 +28,7 @@ export class NPlusBuyBehavior {
         return false;
     }
     async action() {
+        console.log(4);
         const buy = config.status === "virtual" ? "VTTC0802U" : "TTTC0012U";
         const canBuy = await new CanBuy.Builder(this.accessToken, config.symbolInverse, "01", "01", "N", "N")
             .build()
@@ -47,21 +48,21 @@ export class NPlusBuyBehavior {
             //     `${String(getTimeInterval(getTradingTime(), 5).index)}+buy`
             //   ),
             // ]);
-            // await logInsert("매수",this.symbol, buyCount);
+            // await logInsert("매수", config.symbolInverse as string, buyCount);
             // await sendMail("TRADING_TRY", {
-            //   symbolName: this.symbol,
+            //   symbolName: config.symbolInverse as string,
             //   tradingCount: buyCount,
             //   type: "매수",
             //   date: getNowDate(),
             //   bPercent: this.bPercent,
             //   money: this.price,
-            //   rsi:this.rsi,
+            //   rsi: this.rsi,
             // });
         }
     }
-    static getInstance(bPercent, currentHoldings, rsi, price) {
+    static getInstance(bPercent, currentHoldings, rsi, price, accessToken) {
         if (!this.instance) {
-            return new NPlusBuyBehavior(bPercent, currentHoldings, rsi, price);
+            return new NPlusBuyBehavior(bPercent, currentHoldings, rsi, price, accessToken);
         }
         return this.instance;
     }

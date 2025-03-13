@@ -9,13 +9,16 @@ import { getValue } from "../db/redisManager.js";
  */
 const isTradingAllowed = async (operationType: string): Promise<boolean> => {
   const trading = await getValue("tradingTime");
-  if (trading === null) {
+  if (
+    trading === null &&
+    (operationType === "sell" || operationType === "cut")
+  ) {
+    return false;
+  } else if (trading === null && operationType === "buy") {
     return true;
   }
-
   const [tradingTime, status] = trading.split("+");
   const newTradingTime = getTimeInterval(getTradingTime(), 5);
-
   if (String(tradingTime) === String(newTradingTime.index)) {
     if (status === "buy") {
       return operationType === "sell";

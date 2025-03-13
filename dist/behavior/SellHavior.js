@@ -8,13 +8,15 @@ export class NPlusSellHahavior {
     buyPrice;
     accessToken;
     qty;
+    bPercent;
     static instance;
-    constructor(currentHoldings, price, buyPrice, accessToken, qty) {
+    constructor(currentHoldings, price, buyPrice, accessToken, qty, bPercent) {
         this.currentHoldings = currentHoldings;
         this.price = price;
         this.buyPrice = buyPrice;
         this.accessToken = accessToken;
         this.qty = qty;
+        this.bPercent = bPercent;
     }
     async evaluate() {
         const canSell = await isTradingAllowed("sell");
@@ -26,6 +28,7 @@ export class NPlusSellHahavior {
         return false;
     }
     async action() {
+        console.log(3);
         const sell = config.status === "virtual" ? "VTTC0801U" : "TTTC0011U";
         await new TradingOrder.Builder(this.accessToken, sell, config.symbolInverse, "01", String(this.qty), "0")
             .build()
@@ -34,20 +37,20 @@ export class NPlusSellHahavior {
         //   "tradingTime",
         //   `${String(getTimeInterval(getTradingTime(), 5).index)}+sell`
         // ),
-        // await logInsert("매도", this.symbol, this.qty);
+        // await logInsert("매도", config.symbolInverse as string, this.qty);
         // await sendMail("TRADING_TRY", {
-        //   symbolName: this.symbol,
+        //   symbolName: config.symbolInverse as string,
         //   tradingCount: this.qty,
         //   type: "매도",
         //   date: getNowDate(),
         //   bPercent: this.bPercent,
         //   money: this.price,
-        //   rsi:"알 필요 없음",
+        //   rsi: "알 필요 없음",
         // });
     }
-    static getInstance(currentHoldings, price, buyPrice) {
+    static getInstance(currentHoldings, price, buyPrice, accessToken, qty, bPercent) {
         if (!this.instance) {
-            return new NPlusSellHahavior(currentHoldings, price, buyPrice);
+            return new NPlusSellHahavior(currentHoldings, price, buyPrice, accessToken, qty, bPercent);
         }
         return this.instance;
     }

@@ -8,7 +8,7 @@ import StockTimeSeriesPrice from "../api/core/StockTimeSeriesPrice.js";
 const getSecondStockScheduler = async (
   strategy: (price: number, accessToken: string) => Promise<void>
 ) => {
-  cron.schedule("*/2 * * * * 1-5", async function () {
+  cron.schedule("*/8 * * * * 1-5", async function () {
     try {
       const accessToken = await getValue("accessToken");
       const now = new Date();

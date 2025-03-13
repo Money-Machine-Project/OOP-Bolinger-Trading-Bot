@@ -26,6 +26,7 @@ export class NPlusCutBehavior {
         return false;
     }
     async action() {
+        console.log(2);
         const sell = config.status === "virtual" ? "VTTC0801U" : "TTTC0011U";
         await new TradingOrder.Builder(this.accessToken, sell, this.data.output1[0].pdno, "00", String(this.data.output1[0].hldg_qty), String(this.price))
             .build()
