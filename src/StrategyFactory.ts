@@ -8,9 +8,10 @@ abstract class StrategyFactory {
 }
 
 export class NPusStrategyFactory extends StrategyFactory {
-  static override createStrategy() {
+  static override async createStrategy() {
+    await SubscriptionManager.getInstance().addEvent("redis-flag");
+    await SubscriptionManager.getInstance().addEvent("db-log");
     return NPusStrategy.getInstance();
-    //   SubscriptionManager.getInstance().subscribe()
   }
 }
 

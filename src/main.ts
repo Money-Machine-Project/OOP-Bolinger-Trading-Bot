@@ -1,4 +1,3 @@
-import { promises } from "nodemailer/lib/xoauth2/index.js";
 import {
   NPusStrategyFactory,
   UpDownStrategyFactory,
@@ -10,9 +9,7 @@ async function main(
     strategy: (price: number, accessToken: string) => Promise<void>
   ) => void
 ) {
-  const strategy = NPusStrategyFactory.createStrategy();
-  await SubscriptionManager.getInstance().addEvent("redis-flag");
-  await SubscriptionManager.getInstance().addEvent("db-log");
+  const strategy = await NPusStrategyFactory.createStrategy();
   scheduler(strategy.exe);
 }
 
