@@ -66,7 +66,12 @@ export class NPusStrategy extends Strategy {
           price,
           buyPrice
         ),
-        action: NPlusSellAction.getInstance(),
+        action: NPlusSellAction.getInstance(
+          accessToken,
+          currentHoldings,
+          bollingerX2.bPercent,
+          price
+        ),
       },
       {
         condition: NPlusBuyCondition.getInstance(
@@ -75,7 +80,12 @@ export class NPusStrategy extends Strategy {
           rsi,
           price
         ),
-        action: NPlusBuyAction.getInstance(),
+        action: NPlusBuyAction.getInstance(
+          accessToken,
+          price,
+          bollingerX2.bPercent,
+          rsi
+        ),
       },
     ];
     for (const pair of nPlusPair) {

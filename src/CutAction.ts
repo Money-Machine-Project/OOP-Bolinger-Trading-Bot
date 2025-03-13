@@ -30,23 +30,23 @@ export class NPlusCutAction implements CutAction {
     )
       .build()
       .handle();
-    await setValue(
-      "tradingTime",
-      `${String(getTimeInterval(getTradingTime(), 5).index)}+cut`
-    );
-    await logInsert(
-      "매도",
-      this.data.output1[0].prdt_name,
-      this.data.output1[0].hldg_qty
-    );
-    await sendMail("TRADING_CUT_OFF", {
-      cutOffPrice: this.sellPrice,
-      currentPrice: this.price,
-      symbol: this.data.output1[0].prdt_name,
-      tradingCount: this.data.output1[0].hldg_qty,
-      money: this.price,
-      type: "손절 매도",
-    });
+    // await setValue(
+    //   "tradingTime",
+    //   `${String(getTimeInterval(getTradingTime(), 5).index)}+cut`
+    // );
+    // await logInsert(
+    //   "매도",
+    //   this.data.output1[0].prdt_name,
+    //   this.data.output1[0].hldg_qty
+    // );
+    // await sendMail("TRADING_CUT_OFF", {
+    //   cutOffPrice: this.sellPrice,
+    //   currentPrice: this.price,
+    //   symbol: this.data.output1[0].prdt_name,
+    //   tradingCount: this.data.output1[0].hldg_qty,
+    //   money: this.price,
+    //   type: "손절 매도",
+    // });
   }
 
   static getInstance(

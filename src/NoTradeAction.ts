@@ -2,8 +2,10 @@ import RetradingOrder from "./api/core/RetradingOrder.js";
 import TradingOrder from "./api/core/TradingOrder.js";
 import TradingSettlementDetail from "./api/core/TradingSettlementDetail.js";
 import config from "./config/config.js";
-import { getValue } from "./db/redisManager.js";
+import { getValue, setValue } from "./db/redisManager.js";
 import getKoreaDate from "./util/getKoreaDate.js";
+import getTimeInterval from "./util/getTimeInterval.js";
+import getTradingTime from "./util/getTradingTime.js";
 
 export interface NoTradingAction {
   action(): Promise<void> | void;
@@ -24,6 +26,10 @@ export class NPlusNoTradingAction implements NoTradingAction {
       .build()
       .handle();
     if (!result.output[0]) {
+      setValue(
+        "tradingTime",
+        `${String(getTimeInterval(getTradingTime(), 5).index)}+sell`
+      );
       return;
       // 진행 되어야 함.
     }
