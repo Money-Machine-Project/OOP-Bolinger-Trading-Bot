@@ -27,6 +27,7 @@ export class NPlusBuyCondition implements BuyCondition {
     }
     return false;
   }
+
   static getInstance(
     bPercent: number,
     currentHoldings: number,

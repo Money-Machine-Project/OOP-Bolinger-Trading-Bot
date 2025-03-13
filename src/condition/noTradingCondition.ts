@@ -19,6 +19,7 @@ export class NPlusNoTradingCondition implements NoTradingCondition {
     }
     return false;
   }
+
   static getInstance(tradingTime: string) {
     if (!this.instance) {
       return new NPlusNoTradingCondition(tradingTime);

@@ -13,6 +13,7 @@ export class NPlusSellCondition implements SellCondition {
     private price: number,
     private buyPrice: number
   ) {}
+
   async evaluate(): Promise<boolean> {
     const canSell = await isTradingAllowed("sell");
     if (
@@ -24,6 +25,7 @@ export class NPlusSellCondition implements SellCondition {
     }
     return false;
   }
+
   static getInstance(currentHoldings: number, price: number, buyPrice: number) {
     if (!this.instance) {
       return new NPlusSellCondition(currentHoldings, price, buyPrice);
