@@ -1,29 +1,57 @@
-import { CutFilter, DefaultFilter, NoTradeFilter, TradingFilter, } from "./filter/index.js";
-import AccessToken from "./api/core/AccessToken.js";
+import { getArray, getValue } from "./db/redisManager.js";
+import StockBalance from "./api/core/StockBalance.js";
+import { NPlusCutCondition } from "./condition/CutCondition.js";
+import { NPlusBuyCondition } from "./condition/BuyCondition.js";
+import getBollingerBands from "./util/getBollingerBands.js";
+import makeRsi from "./util/makeRsi.js";
+import { NPlusNoTradingCondition, } from "./condition/NoTradingCondition.js";
+import { NPlusSellCondition, } from "./condition/SellCondition.js";
+import { NPlusNoTradingAction, } from "./action/NoTradeAction.js";
+import { NPlusCutAction } from "./action/CutAction.js";
+import { NPlusSellAction } from "./action/SellAction.js";
+import { NPlusBuyAction } from "./action/BuyAction.js";
 class Strategy {
+    constructor() { }
     static getInstance() { }
 }
 export class NPusStrategy extends Strategy {
     static instance;
-    async exe() {
+    async exe(price, accessToken) {
         console.log("NPlus 전략 시작");
-        const aa = new AccessToken.Builder().build();
-        console.log(await aa.handle());
-        const df = new DefaultFilter();
-        let filter = df;
-        if (false) {
-            const ntf = new NoTradeFilter();
-            filter = filter.setNext(ntf);
+        const [sellPrice, data, tradingTime] = await Promise.all([
+            getValue("sellPrice"),
+            new StockBalance.Builder(accessToken).build().handle(),
+            getValue("tradingTime"),
+        ]);
+        const currentHoldings = data[0] ? data[0].hldg_qty : 0;
+        const buyPrice = await getValue("buyPrice");
+        const historicalData = await getArray("inverseStockPrice");
+        const bollingerX2 = getBollingerBands(historicalData, price, 2);
+        const rsi = makeRsi(historicalData, price, 5);
+        const nPlusPair = [
+            {
+                condition: NPlusNoTradingCondition.getInstance(tradingTime),
+                action: NPlusNoTradingAction.getInstance(),
+            },
+            {
+                condition: NPlusCutCondition.getInstance(sellPrice, price, data),
+                action: NPlusCutAction.getInstance(accessToken, data, price, sellPrice),
+            },
+            {
+                condition: NPlusSellCondition.getInstance(currentHoldings, price, buyPrice),
+                action: NPlusSellAction.getInstance(accessToken, currentHoldings, bollingerX2.bPercent, price),
+            },
+            {
+                condition: NPlusBuyCondition.getInstance(bollingerX2.bPercent, currentHoldings, rsi, price),
+                action: NPlusBuyAction.getInstance(accessToken, price, bollingerX2.bPercent, rsi),
+            },
+        ];
+        for (const pair of nPlusPair) {
+            if (await pair.condition.evaluate()) {
+                await pair.action.action();
+                break;
+            }
         }
-        if (false) {
-            const cf = new CutFilter();
-            filter = filter.setNext(cf);
-        }
-        if (true) {
-            const tf = new TradingFilter();
-            filter = filter.setNext(tf);
-        }
-        await df.handle();
     }
     static getInstance() {
         if (!this.instance) {

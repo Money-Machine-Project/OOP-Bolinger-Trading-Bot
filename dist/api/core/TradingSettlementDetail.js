@@ -4,7 +4,6 @@ import axios from "axios";
 import config from "../../config/config.js";
 class TradingSettlementDetail extends OpenApi {
     today;
-    accessToken;
     symbol;
     type;
     tradeComplete;
@@ -12,7 +11,7 @@ class TradingSettlementDetail extends OpenApi {
     ctxAreaFK100 = "";
     ctxAreaNk100 = "";
     constructor(today, accessToken, symbol, type, tradingComplete, orderId, ctxAreaFK100, ctxAreaNk100) {
-        super();
+        super(accessToken);
         this.today = today;
         this.accessToken = accessToken;
         this.symbol = symbol;

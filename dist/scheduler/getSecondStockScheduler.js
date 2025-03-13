@@ -1,24 +1,22 @@
 import cron from "node-cron";
 import { getValue } from "../db/redisManager.js";
 import { redisStatusCheck } from "../util/serverStatusCheck.js";
-import main from "../main.js";
 import config from "../config/config.js";
 import StockTimeSeriesPrice from "../api/core/StockTimeSeriesPrice.js";
-const getSecondStockScheduler = async () => {
-    cron.schedule("*/2 * 9-14 * * 1-5", async function () {
+const getSecondStockScheduler = async (strategy) => {
+    cron.schedule("*/2 * * * * 1-5", async function () {
         try {
             const accessToken = await getValue("accessToken");
             const now = new Date();
             const hours = now.getHours();
             const minutes = now.getMinutes();
             // 9시 30분 이후에만 실행
-            if (hours > 9 || (hours === 9 && minutes >= 30)) {
-                await redisStatusCheck();
-                //   await sleep(2000);
-                const object = new StockTimeSeriesPrice.Builder(accessToken, config.symbolInverse).build();
-                const inverseStockData = await object.handle();
-                await main(inverseStockData.stck_prpr, accessToken);
-            }
+            //  if (hours > 9 || (hours === 9 && minutes >= 30)) {
+            await redisStatusCheck();
+            //   await sleep(2000);
+            const object = new StockTimeSeriesPrice.Builder(accessToken, config.symbolInverse).build();
+            const inverseStockData = await object.handle();
+            await strategy(inverseStockData.stck_prpr, accessToken);
         }
         catch (error) {
             console.error("스케줄러 실행 중 오류 발생:", error);

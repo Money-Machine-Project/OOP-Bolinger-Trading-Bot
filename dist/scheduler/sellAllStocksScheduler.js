@@ -38,7 +38,7 @@ const sellAllStocksScheduler = async () => {
                     return;
                 }
                 for (const element of data.output1) {
-                    new TradingOrder.Builder(accessToken, "VTTC0801U", element.pdno, "01", element.hldg_qty, "0")
+                    await new TradingOrder.Builder(accessToken, "VTTC0801U", element.pdno, "01", element.hldg_qty, "0")
                         .build()
                         .handle();
                     await logInsert("매도", element.prdt_name, element.hldg_qty);

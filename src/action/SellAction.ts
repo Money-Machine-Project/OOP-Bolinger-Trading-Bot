@@ -1,11 +1,5 @@
-import TradingOrder from "./api/core/TradingOrder.js";
-import config from "./config/config.js";
-import { logInsert } from "./db/insert.js";
-import { setValue } from "./db/redisManager.js";
-import sendMail from "./mail/sendMail.js";
-import getNowDate from "./util/getNowDate.js";
-import getTimeInterval from "./util/getTimeInterval.js";
-import getTradingTime from "./util/getTradingTime.js";
+import TradingOrder from "../api/core/TradingOrder.js";
+import config from "../config/config.js";
 
 export interface SellAction {
   action(): Promise<void> | void;

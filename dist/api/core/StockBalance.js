@@ -3,9 +3,8 @@ import OpenApiBuilder from "../OpenApiBuilder.js";
 import axios from "axios";
 import config from "../../config/config.js";
 class StockBalance extends OpenApi {
-    accessToken;
     constructor(accessToken) {
-        super();
+        super(accessToken);
         this.accessToken = accessToken;
     }
     async handle() {

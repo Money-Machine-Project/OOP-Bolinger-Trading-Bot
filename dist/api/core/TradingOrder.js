@@ -3,14 +3,13 @@ import OpenApiBuilder from "../OpenApiBuilder.js";
 import axios from "axios";
 import config from "../../config/config.js";
 class TradingOrder extends OpenApi {
-    accessToken;
     trId;
     symbol;
     orderType;
     orderQuantity;
     orderPrice;
     constructor(accessToken, trId, symbol, orderType, orderQuantitiy, orderPrice) {
-        super();
+        super(accessToken);
         this.accessToken = accessToken;
         this.trId = trId;
         this.symbol = symbol;

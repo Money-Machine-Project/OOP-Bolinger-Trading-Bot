@@ -3,14 +3,13 @@ import OpenApiBuilder from "../OpenApiBuilder.js";
 import axios from "axios";
 import config from "../../config/config.js";
 class CanBuy extends OpenApi {
-    accessToken;
     symbol;
     unpr;
     dvsn;
     evluAmtIcld;
     icld;
     constructor(accessToken, symbol, unpr, dvsn, evluAmtIcld, icld) {
-        super();
+        super(accessToken);
         this.accessToken = accessToken;
         this.symbol = symbol;
         this.unpr = unpr;

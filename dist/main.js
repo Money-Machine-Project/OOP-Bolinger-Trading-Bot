@@ -1,6 +1,9 @@
 import { NPusStrategyFactory, } from "./StrategyFactory.js";
-async function main(price, accessToken) {
+import { SubscriptionManager } from "./SubscriptionManager.js";
+async function main(scheduler) {
     const strategy = NPusStrategyFactory.createStrategy();
-    const nplus = await strategy.exe();
+    await SubscriptionManager.getInstance().addEvent("redis-flag");
+    await SubscriptionManager.getInstance().addEvent("db-log");
+    scheduler(strategy.exe);
 }
 export default main;
