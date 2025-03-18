@@ -52,7 +52,6 @@ export class NPlusBuyBehavior implements BuyBehavior {
     )
       .build()
       .handle();
-    //  await sleep(1000);
     const buyCount = Math.floor(Number(canBuy.nrcvb_buy_amt) / this.price) - 1;
     if (Number(canBuy.max_buy_qty) > 0 && buyCount !== 0) {
       await new TradingOrder.Builder(
@@ -65,27 +64,32 @@ export class NPlusBuyBehavior implements BuyBehavior {
       )
         .build()
         .handle();
-      // await Promise.all([
-      //   setValue("buyPrice", String(this.price)),
-      //   setValue("buyCount", String(buyCount)),
-      //   setValue("sellPrice", String(Number(this.price) - 10)),
-      //   setValue(
-      //     "tradingTime",
-      //     `${String(getTimeInterval(getTradingTime(), 5).index)}+buy`
-      //   ),
-      // ]);
-      // await logInsert("매수", config.symbolInverse as string, buyCount);
-      // await sendMail("TRADING_TRY", {
-      //   symbolName: config.symbolInverse as string,
-      //   tradingCount: buyCount,
-      //   type: "매수",
-      //   date: getNowDate(),
-      //   bPercent: this.bPercent,
-      //   money: this.price,
-      //   rsi: this.rsi,
-      // });
     }
+    await this.notice(buyCount);
   }
+
+  private async notice(buyCount: string | number) {
+    await Promise.all([
+      setValue("buyPrice", String(this.price)),
+      setValue("buyCount", String(buyCount)),
+      setValue("sellPrice", String(Number(this.price) - 10)),
+      setValue(
+        "tradingTime",
+        `${String(getTimeInterval(getTradingTime(), 5).index)}+buy`
+      ),
+    ]);
+    await logInsert("매수", config.symbolInverse as string, Number(buyCount));
+    await sendMail("TRADING_TRY", {
+      symbolName: config.symbolInverse as string,
+      tradingCount: buyCount,
+      type: "매수",
+      date: getNowDate(),
+      bPercent: this.bPercent,
+      money: this.price,
+      rsi: this.rsi,
+    });
+  }
+
   static getInstance(
     bPercent: number,
     currentHoldings: number,

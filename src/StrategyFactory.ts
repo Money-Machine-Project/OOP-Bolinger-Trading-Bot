@@ -1,5 +1,4 @@
 import { NPusStrategy, UpDownStrategy } from "./Strategy.js";
-import { SubscriptionManager } from "./SubscriptionManager.js";
 
 abstract class StrategyFactory {
   static createStrategy() {
@@ -9,8 +8,6 @@ abstract class StrategyFactory {
 
 export class NPusStrategyFactory extends StrategyFactory {
   static override async createStrategy() {
-    await SubscriptionManager.getInstance().addEvent("redis-flag");
-    await SubscriptionManager.getInstance().addEvent("db-log");
     return NPusStrategy.getInstance();
   }
 }

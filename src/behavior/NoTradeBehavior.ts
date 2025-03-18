@@ -88,14 +88,18 @@ export class NPlusNoTradeBehavior implements NoTradeBehavior {
         .handle();
     }
     console.log("완료");
-    // await Promise.all([
-    //   setValue(
-    //     "tradingTime",
-    //     `${String(getTimeInterval(getTradingTime(), 5).index)}+sell`
-    //   ),
-    //   sendMail("TRADING_TIME_OUT", {}),
-    //   logInsert("거래 청산", "0", 0),
-    // ]);
+    await this.notice();
+  }
+
+  private async notice() {
+    await Promise.all([
+      setValue(
+        "tradingTime",
+        `${String(getTimeInterval(getTradingTime(), 5).index)}+sell`
+      ),
+      sendMail("TRADING_TIME_OUT", {}),
+      logInsert("거래 청산", "0", 0),
+    ]);
   }
 
   static getInstance(tradingTime: string, accessToken: string) {

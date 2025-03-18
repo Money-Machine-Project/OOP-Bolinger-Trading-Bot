@@ -38,7 +38,6 @@ export class NPlusSellHahavior implements SellBehavior {
   }
 
   async action(): Promise<void> {
-    console.log(3);
     const sell = config.status === "virtual" ? "VTTC0801U" : "TTTC0011U";
     await new TradingOrder.Builder(
       this.accessToken,
@@ -50,20 +49,24 @@ export class NPlusSellHahavior implements SellBehavior {
     )
       .build()
       .handle();
-    // await setValue(
-    //   "tradingTime",
-    //   `${String(getTimeInterval(getTradingTime(), 5).index)}+sell`
-    // ),
-    // await logInsert("매도", config.symbolInverse as string, this.qty);
-    // await sendMail("TRADING_TRY", {
-    //   symbolName: config.symbolInverse as string,
-    //   tradingCount: this.qty,
-    //   type: "매도",
-    //   date: getNowDate(),
-    //   bPercent: this.bPercent,
-    //   money: this.price,
-    //   rsi: "알 필요 없음",
-    // });
+    await this.notice();
+  }
+
+  private async notice() {
+    await setValue(
+      "tradingTime",
+      `${String(getTimeInterval(getTradingTime(), 5).index)}+sell`
+    ),
+      await logInsert("매도", config.symbolInverse as string, this.qty);
+    await sendMail("TRADING_TRY", {
+      symbolName: config.symbolInverse as string,
+      tradingCount: this.qty,
+      type: "매도",
+      date: getNowDate(),
+      bPercent: this.bPercent,
+      money: this.price,
+      rsi: "알 필요 없음",
+    });
   }
 
   static getInstance(
