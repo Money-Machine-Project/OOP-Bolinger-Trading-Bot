@@ -5,9 +5,8 @@ class StrategyFactory {
     }
 }
 export class NPusStrategyFactory extends StrategyFactory {
-    static createStrategy() {
+    static async createStrategy() {
         return NPusStrategy.getInstance();
-        //   SubscriptionManager.getInstance().subscribe()
     }
 }
 export class UpDownStrategyFactory extends StrategyFactory {

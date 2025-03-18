@@ -2,7 +2,6 @@ import {
   NPusStrategyFactory,
   UpDownStrategyFactory,
 } from "./StrategyFactory.js";
-import { SubscriptionManager } from "./SubscriptionManager.js";
 
 async function main(
   scheduler: (

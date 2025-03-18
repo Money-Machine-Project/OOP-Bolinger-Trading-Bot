@@ -1,6 +1,12 @@
 import CanBuy from "../api/core/CanBuy.js";
 import TradingOrder from "../api/core/TradingOrder.js";
 import config from "../config/config.js";
+import { logInsert } from "../db/insert.js";
+import { setValue } from "../db/redisManager.js";
+import sendMail from "../mail/sendMail.js";
+import getNowDate from "../util/getNowDate.js";
+import getTimeInterval from "../util/getTimeInterval.js";
+import getTradingTime from "../util/getTradingTime.js";
 import isTradingAllowed from "../util/isTradeAllowed.js";
 export class NPlusBuyBehavior {
     bPercent;
@@ -33,32 +39,31 @@ export class NPlusBuyBehavior {
         const canBuy = await new CanBuy.Builder(this.accessToken, config.symbolInverse, "01", "01", "N", "N")
             .build()
             .handle();
-        //  await sleep(1000);
         const buyCount = Math.floor(Number(canBuy.nrcvb_buy_amt) / this.price) - 1;
         if (Number(canBuy.max_buy_qty) > 0 && buyCount !== 0) {
             await new TradingOrder.Builder(this.accessToken, buy, config.symbolInverse, "01", String(buyCount), "0")
                 .build()
                 .handle();
-            // await Promise.all([
-            //   setValue("buyPrice", String(this.price)),
-            //   setValue("buyCount", String(buyCount)),
-            //   setValue("sellPrice", String(Number(this.price) - 10)),
-            //   setValue(
-            //     "tradingTime",
-            //     `${String(getTimeInterval(getTradingTime(), 5).index)}+buy`
-            //   ),
-            // ]);
-            // await logInsert("매수", config.symbolInverse as string, buyCount);
-            // await sendMail("TRADING_TRY", {
-            //   symbolName: config.symbolInverse as string,
-            //   tradingCount: buyCount,
-            //   type: "매수",
-            //   date: getNowDate(),
-            //   bPercent: this.bPercent,
-            //   money: this.price,
-            //   rsi: this.rsi,
-            // });
         }
+        await this.notice(buyCount);
+    }
+    async notice(buyCount) {
+        await Promise.all([
+            setValue("buyPrice", String(this.price)),
+            setValue("buyCount", String(buyCount)),
+            setValue("sellPrice", String(Number(this.price) - 10)),
+            setValue("tradingTime", `${String(getTimeInterval(getTradingTime(), 5).index)}+buy`),
+        ]);
+        await logInsert("매수", config.symbolInverse, Number(buyCount));
+        await sendMail("TRADING_TRY", {
+            symbolName: config.symbolInverse,
+            tradingCount: buyCount,
+            type: "매수",
+            date: getNowDate(),
+            bPercent: this.bPercent,
+            money: this.price,
+            rsi: this.rsi,
+        });
     }
     static getInstance(bPercent, currentHoldings, rsi, price, accessToken) {
         if (!this.instance) {

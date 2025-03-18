@@ -1,4 +1,3 @@
-import { SubscriptionManager } from "./SubscriptionManager.js";
 import { getArray, getValue } from "./db/redisManager.js";
 import StockBalance from "./api/core/StockBalance.js";
 import getBollingerBands from "./util/getBollingerBands.js";

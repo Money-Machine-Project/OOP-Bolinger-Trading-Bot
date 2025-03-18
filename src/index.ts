@@ -13,7 +13,6 @@ import dayResultScheduler from "./scheduler/dayResultScheduler.js";
 import minuteCandleResetScheduler from "./scheduler/minuteCandleResetScheduler.js";
 import getSecondStockScheduler from "./scheduler/getSecondStockScheduler.js";
 import accessTokenManager from "./api/token/accessTokenManager.js";
-import { SubscriptionManager } from "./SubscriptionManager.js";
 
 dotenv.config();
 

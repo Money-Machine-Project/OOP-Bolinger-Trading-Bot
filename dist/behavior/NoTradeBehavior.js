@@ -2,7 +2,9 @@ import RetradingOrder from "../api/core/RetradingOrder.js";
 import TradingOrder from "../api/core/TradingOrder.js";
 import TradingSettlementDetail from "../api/core/TradingSettlementDetail.js";
 import config from "../config/config.js";
+import { logInsert } from "../db/insert.js";
 import { setValue } from "../db/redisManager.js";
+import sendMail from "../mail/sendMail.js";
 import checkTradingTimeExceed from "../util/checkTradingTimeExceed.js";
 import getKoreaDate from "../util/getKoreaDate.js";
 import getTimeInterval from "../util/getTimeInterval.js";
@@ -51,14 +53,14 @@ export class NPlusNoTradeBehavior {
                 .handle();
         }
         console.log("완료");
-        // await Promise.all([
-        //   setValue(
-        //     "tradingTime",
-        //     `${String(getTimeInterval(getTradingTime(), 5).index)}+sell`
-        //   ),
-        //   sendMail("TRADING_TIME_OUT", {}),
-        //   logInsert("거래 청산", "0", 0),
-        // ]);
+        await this.notice();
+    }
+    async notice() {
+        await Promise.all([
+            setValue("tradingTime", `${String(getTimeInterval(getTradingTime(), 5).index)}+sell`),
+            sendMail("TRADING_TIME_OUT", {}),
+            logInsert("거래 청산", "0", 0),
+        ]);
     }
     static getInstance(tradingTime, accessToken) {
         if (!this.instance) {
